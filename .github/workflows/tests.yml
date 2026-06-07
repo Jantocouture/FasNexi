@@ -1,0 +1,72 @@
+name: Tests
+
+on:
+  push:
+    branches: [ feature/style-dna-onboarding ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  unit-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+      - name: Install server deps
+        working-directory: server
+        run: npm ci
+      - name: Generate Prisma
+        working-directory: server
+        run: npx prisma generate || true
+      - name: Run unit tests
+        working-directory: server
+        env:
+          JWT_SECRET: test_secret
+          DEV_AUTH: 'true'
+        run: npm test -- --runInBand --testPathPattern=server/tests/*.unit.test.js
+
+  integration-tests:
+    needs: unit-tests
+    runs-on: ubuntu-latest
+    services:
+      redis:
+        image: redis:7
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 5s
+          --health-timeout 2s
+          --health-retries 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+      - name: Install server deps
+        working-directory: server
+        run: npm ci
+      - name: Generate Prisma
+        working-directory: server
+        run: npx prisma generate || true
+      - name: Start server
+        working-directory: server
+        env:
+          REDIS_URL: redis://127.0.0.1:6379
+          JWT_SECRET: test_secret_int
+          DEV_AUTH: 'true'
+          ALLOWED_ORIGINS: 'http://localhost'
+        run: |
+          node index.js &
+          # wait for server to start
+          sleep 3
+      - name: Run integration tests
+        working-directory: server
+        env:
+          REDIS_URL: redis://127.0.0.1:6379
+          JWT_SECRET: test_secret_int
+        run: npm test -- --runInBand --testPathPattern=server/tests/*.integration.test.js

@@ -1,14 +1,13 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, ActivityIndicator, FlatList, StyleSheet, Image, Alert, RefreshControl } from 'react-native';
 import { fetchFeed } from '../api/feedClient';
+import { subscribeToProfile, disconnectSocket } from '../api/socketClient';
 
 export default function FeedScreen({ route }: any) {
   const { profileId } = route.params || {};
   const [loading, setLoading] = useState(false);
   const [items, setItems] = useState<any[]>([]);
   const [refreshing, setRefreshing] = useState(false);
-  const pollAttempts = useRef(0);
-  const polling = useRef(false);
 
   const load = async () => {
     if (!profileId) return;
@@ -25,44 +24,35 @@ export default function FeedScreen({ route }: any) {
   };
 
   useEffect(() => {
-    load();
-  }, [profileId]);
-
-  // Polling: if no items, attempt to poll a few times to wait for background worker
-  useEffect(() => {
-    let abort = false;
-    const startPolling = async () => {
+    let unsubscribe: any;
+    const setup = async () => {
+      await load();
       if (!profileId) return;
-      if (polling.current) return;
-      polling.current = true;
-      pollAttempts.current = 0;
-      const maxAttempts = 10; // ~20s with 2s interval
-      const intervalMs = 2000;
-      while (!abort && pollAttempts.current < maxAttempts) {
-        if (items && items.length > 0) break;
-        await new Promise((r) => setTimeout(r, intervalMs));
-        try {
-          const res = await fetchFeed(String(profileId));
-          if (res.items && res.items.length > 0) {
-            setItems(res.items);
-            break;
+      try {
+        unsubscribe = await subscribeToProfile(profileId, (newItems: any[]) => {
+          if (Array.isArray(newItems) && newItems.length > 0) {
+            setItems(newItems);
           }
-        } catch (err) {
-          console.warn('poll error', err);
-        }
-        pollAttempts.current += 1;
+        });
+      } catch (e) {
+        console.warn('subscribe failed', e);
       }
-      polling.current = false;
     };
-
-    if ((!items || items.length === 0) && profileId) startPolling();
-    return () => { abort = true; };
-  }, [profileId, items]);
+    setup();
+    return () => {
+      if (unsubscribe) unsubscribe();
+      disconnectSocket();
+    };
+  }, [profileId]);
 
   const onRefresh = async () => {
     setRefreshing(true);
     try {
-      await load();
+      const res = await fetchFeed(String(profileId));
+      setItems(res.items || []);
+    } catch (err) {
+      console.error(err);
+      Alert.alert('Error', 'Failed to load feed');
     } finally {
       setRefreshing(false);
     }
@@ -93,7 +83,7 @@ export default function FeedScreen({ route }: any) {
               </View>
             </View>
           )}
-          ListEmptyComponent={<View style={styles.center}><Text>No items yet. We'll keep looking — try pulling to refresh.</Text></View>}
+          ListEmptyComponent={<View style={styles.center}><Text>No items yet. We'll update in real time when they're ready.</Text></View>}
         />
       )}
     </View>

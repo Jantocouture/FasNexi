@@ -1,13 +1,15 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { View, Text, Button, StyleSheet, ActivityIndicator, Alert, FlatList, Image } from 'react-native';
 import { useOnboardingStore } from '../store/onboardingStore';
 import { submitStyleProfile } from '../../api/styleProfileClient';
+import { fetchFeed } from '../../api/feedClient';
 
 export default function PreviewScreen({ navigation }: any) {
   const state = useOnboardingStore();
   const [loading, setLoading] = useState(false);
   const [feedPreview, setFeedPreview] = useState<any[]>([]);
   const [profileId, setProfileId] = useState<string | null>(null);
+  const pollingRef = useRef({ attempts: 0, active: false });
 
   const finish = async () => {
     setLoading(true);
@@ -33,12 +35,46 @@ export default function PreviewScreen({ navigation }: any) {
 
       useOnboardingStore.getState().reset();
       Alert.alert('Success', 'Style DNA saved. Preview your feed below.');
+
+      // start polling if preview empty
+      if ((!resp.feedPreview || resp.feedPreview.length === 0) && resp.styleProfileId) {
+        startPolling(resp.styleProfileId);
+      }
     } catch (err) {
       console.error(err);
       Alert.alert('Error', String(err));
     } finally {
       setLoading(false);
     }
+  };
+
+  const startPolling = (pid: string) => {
+    if (pollingRef.current.active) return;
+    pollingRef.current.active = true;
+    pollingRef.current.attempts = 0;
+    const maxAttempts = 12; // ~24s with 2s interval
+    const intervalMs = 2000;
+
+    const tick = async () => {
+      if (!pollingRef.current.active) return;
+      if (pollingRef.current.attempts >= maxAttempts) {
+        pollingRef.current.active = false;
+        return;
+      }
+      try {
+        const res = await fetchFeed(pid);
+        if (res.items && res.items.length > 0) {
+          setFeedPreview(res.items.slice(0, 3));
+          pollingRef.current.active = false;
+          return;
+        }
+      } catch (err) {
+        console.warn('preview poll error', err);
+      }
+      pollingRef.current.attempts += 1;
+      setTimeout(tick, intervalMs);
+    };
+    setTimeout(tick, intervalMs);
   };
 
   return (
@@ -70,6 +106,13 @@ export default function PreviewScreen({ navigation }: any) {
             )}
           />
           <Button title="View full feed" onPress={() => navigation.navigate('Feed', { profileId })} />
+        </View>
+      )}
+
+      {(!feedPreview || feedPreview.length === 0) && profileId && (
+        <View style={{ marginTop: 12 }}>
+          <Text>We’re fetching your personalized feed — this may take a moment.</Text>
+          <Button title="Open full feed" onPress={() => navigation.navigate('Feed', { profileId })} />
         </View>
       )}
     </View>

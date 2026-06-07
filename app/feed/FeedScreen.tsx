@@ -1,28 +1,72 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, ActivityIndicator, FlatList, StyleSheet, Image, Alert } from 'react-native';
+import React, { useEffect, useState, useRef } from 'react';
+import { View, Text, ActivityIndicator, FlatList, StyleSheet, Image, Alert, RefreshControl } from 'react-native';
 import { fetchFeed } from '../api/feedClient';
 
 export default function FeedScreen({ route }: any) {
   const { profileId } = route.params || {};
   const [loading, setLoading] = useState(false);
   const [items, setItems] = useState<any[]>([]);
+  const [refreshing, setRefreshing] = useState(false);
+  const pollAttempts = useRef(0);
+  const polling = useRef(false);
+
+  const load = async () => {
+    if (!profileId) return;
+    setLoading(true);
+    try {
+      const res = await fetchFeed(String(profileId));
+      setItems(res.items || []);
+    } catch (err) {
+      console.error(err);
+      Alert.alert('Error', 'Failed to load feed');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    if (!profileId) return;
-    const load = async () => {
-      setLoading(true);
-      try {
-        const res = await fetchFeed(String(profileId));
-        setItems(res.items || []);
-      } catch (err) {
-        console.error(err);
-        Alert.alert('Error', 'Failed to load feed');
-      } finally {
-        setLoading(false);
-      }
-    };
     load();
   }, [profileId]);
+
+  // Polling: if no items, attempt to poll a few times to wait for background worker
+  useEffect(() => {
+    let abort = false;
+    const startPolling = async () => {
+      if (!profileId) return;
+      if (polling.current) return;
+      polling.current = true;
+      pollAttempts.current = 0;
+      const maxAttempts = 10; // ~20s with 2s interval
+      const intervalMs = 2000;
+      while (!abort && pollAttempts.current < maxAttempts) {
+        if (items && items.length > 0) break;
+        await new Promise((r) => setTimeout(r, intervalMs));
+        try {
+          const res = await fetchFeed(String(profileId));
+          if (res.items && res.items.length > 0) {
+            setItems(res.items);
+            break;
+          }
+        } catch (err) {
+          console.warn('poll error', err);
+        }
+        pollAttempts.current += 1;
+      }
+      polling.current = false;
+    };
+
+    if ((!items || items.length === 0) && profileId) startPolling();
+    return () => { abort = true; };
+  }, [profileId, items]);
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    try {
+      await load();
+    } finally {
+      setRefreshing(false);
+    }
+  };
 
   if (!profileId) {
     return (
@@ -35,10 +79,11 @@ export default function FeedScreen({ route }: any) {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Your Feed</Text>
-      {loading ? <ActivityIndicator /> : (
+      {loading && items.length === 0 ? <ActivityIndicator /> : (
         <FlatList
           data={items}
           keyExtractor={(i) => i.id}
+          refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
           renderItem={({ item }) => (
             <View style={styles.card}>
               {item.payload?.imageUrl ? <Image source={{ uri: item.payload.imageUrl }} style={styles.thumb} /> : null}
@@ -48,6 +93,7 @@ export default function FeedScreen({ route }: any) {
               </View>
             </View>
           )}
+          ListEmptyComponent={<View style={styles.center}><Text>No items yet. We'll keep looking — try pulling to refresh.</Text></View>}
         />
       )}
     </View>

@@ -53,3 +53,12 @@ jobs:
         run: |
           echo "Running issues & project creation script"
           ./scripts/create_issues_and_project.sh
+
+      - name: Show created issues summary
+        run: |
+          echo "--- Created / Identified Issues ---"
+          if [ -f .github/ISSUES/created_issue_ids.txt ]; then
+            cat .github/ISSUES/created_issue_ids.txt
+          else
+            echo "No created_issue_ids.txt found"
+          fi

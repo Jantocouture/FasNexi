@@ -1,0 +1,55 @@
+name: Create Roadmap Project & Issues
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirm:
+        description: 'Confirm to run the create_issues_and_project.sh script'
+        required: false
+        default: 'true'
+
+permissions:
+  contents: read
+  issues: write
+  pull-requests: write
+  packages: read
+  pages: read
+  actions: read
+  administration: read
+  projects: write
+
+jobs:
+  create-roadmap:
+    name: Create Roadmap (Tier-0/1/2) Issues & Project
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install prerequisites (gh, jq)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ca-certificates curl gnupg jq
+          # Install GitHub CLI per official instructions
+          curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg
+          sudo chmod go+r /usr/share/keyrings/githubcli-archive-keyring.gpg
+          echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null
+          sudo apt-get update
+          sudo apt-get install -y gh
+
+      - name: Authenticate gh with GITHUB_TOKEN
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "Authenticating gh..."
+          echo "${GITHUB_TOKEN}" | gh auth login --with-token
+          gh auth status
+
+      - name: Make script executable
+        run: chmod +x scripts/create_issues_and_project.sh
+
+      - name: Run create_issues_and_project.sh
+        run: |
+          echo "Running issues & project creation script"
+          ./scripts/create_issues_and_project.sh

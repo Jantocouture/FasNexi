@@ -8,8 +8,8 @@ OWNER="Jantocouture"
 REPO="FasNexi"
 PROJECT_NAME="Roadmap - MVP"
 
-echo "Creating Tier-1 and Tier-2 issues from .github/ISSUES/*.md..."
-ISSUE_FILES=(.github/ISSUES/TIER1-*.md .github/ISSUES/TIER2-*.md)
+echo "Creating Tier-0, Tier-1 and Tier-2 issues from .github/ISSUES/*.md..."
+ISSUE_FILES=(.github/ISSUES/TIER0-*.md .github/ISSUES/TIER1-*.md .github/ISSUES/TIER2-*.md)
 
 CREATED_IDS_FILE=".github/ISSUES/created_issue_ids.txt"
 > $CREATED_IDS_FILE
@@ -29,7 +29,7 @@ echo "Created issues list saved to $CREATED_IDS_FILE"
 
 # Create project (beta) for repo
 echo "Creating project board: $PROJECT_NAME"
-proj_id=$(gh project create --repo $OWNER/$REPO --name "$PROJECT_NAME" --body "Roadmap for the MVP: Tier-1 and Tier-2 items" --json id | jq -r '.id')
+proj_id=$(gh project create --repo $OWNER/$REPO --name "$PROJECT_NAME" --body "Roadmap for the MVP: Tier-0, Tier-1 and Tier-2 items" --json id | jq -r '.id')
 
 echo "Project created: $proj_id"
 

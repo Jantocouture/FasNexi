@@ -1,93 +1,114 @@
-# STRATEGIC FOUNDATION
 
-## 1.1 Executive Vision Statement
+## 1.4 User Journey Architecture (The Golden Path)
 
-FasNexi is not an AI-powered marketplace. It is the social operating system for African fashion.
+This journey must feel inevitable—each step naturally leads to the next.
 
-The distinction is critical. Marketplaces die when growth stalls. Operating systems become indispensable because they own the entire value chain: Content → Discovery → Wardrobe → Commerce → Creator Income → More Content.
+STEP 1: OPEN APP
+  ↓
+  Sees: fashion inspiration, creators, outfits, trends
+  Emotional state: DISCOVERY
+  (NOT products. Never products first.)
 
-This flywheel is self-reinforcing. Every piece of content feeds discovery. Every discovery builds wardrobes. Every wardrobe drives commerce. Every purchase funds creators. Every creator generates more content. The platform becomes stronger with each revolution—exactly how Instagram, TikTok, and Shopify ecosystems scaled to dominance.
+STEP 2: DISCOVER OUTFIT
+  ↓
+  Taps: "Recreate This Look"
+  Emotional state: ASPIRATION
 
-Our Moat: Most fashion platforms stop at Discovery → Purchase. FasNexi owns Discovery → Wardrobe → Styling → Purchase. Wardrobe data is the atomic unit of personalization, and no competitor will have richer wardrobe intelligence for African fashion consumers.
+STEP 3: PLATFORM RESPONDS
+  ↓
+  Shows: products, designers, tailoring options
+  Emotional state: EMPOWERMENT
 
-The Emotional Promise: Users never feel like they're browsing products. They feel like they're exploring culture. Every screen must evoke: Discovery ("I've never seen this before"), Pride ("This represents African creativity"), Aspiration ("I want to be part of this"), Belonging ("This is my community"), and Empowerment ("I can build a business here").
+STEP 4: SHOP
+  ↓
+  Commerce feels natural. Not forced.
+  Emotional state: SATISFACTION
 
----
+STEP 5: SAVE TO WARDROBE
+  ↓
+  Emotional state: BELONGING
 
-## 1.2 Brand Architecture & Identity System
+STEP 6: AI SUGGESTS
+  ↓
+  "You already own 2 items needed for this outfit."
+  Emotional state: DELIGHT (This is where magic happens.)
 
-### Brand Positioning
-
-- From: AI-Powered African Fashion Marketplace
-- To: The Social Operating System for African Fashion
-- Tagline: Powered By Culture
-- Brand Voice: Confident, celebratory, intelligent, warm—never clinical or purely transactional.
-
-### Visual Identity Constants (Immutable Across All Phases)
-
-Element | Specification | Rationale
----|---:|---
-Primary Black | #0B0B0B | Luxury authority, infinite contrast for vibrant fashion imagery
-Secondary Warm Beige | #E8DCCB | African earth warmth, approachability, reduces cognitive load
-Accent Luxury Gold | #D4AF37 | Progress, selection, reward, aspiration—the color of celebration
-Neutral White | #F5F5F5 | Clean surfaces, input fields, elevated cards
-Heading Font | Playfair Display | Editorial elegance, fashion heritage
-Body Font | Work Sans / Inter | Modern readability at all sizes
-
-### Brand Psychology Implementation
-
-- Gold appears only at moments of value: Progress completion, selected states, CTAs, badges earned. Never decorative.
-- Black backgrounds for immersive experiences: Full-bleed hero images, video players, fashion show streams.
-- Beige for information density: Cards, feed items, product grids—warm but structured.
-- White for transactional clarity: Checkout, measurements, settings.
+Design Principle: The feed is the product. Commerce is the outcome. Wardrobe is the moat. AI is the accelerator.
 
 ---
 
-## 1.3 Product Hierarchy (Tiered Build Order)
+## 1.5 Navigation Architecture (Immutable)
 
-### Tier 1 — MVP Launch (Phases 0–1)
+Bottom navigation must remain these five tabs across all phases:
 
-These form the minimum viable ecosystem. Without them, nothing else matters.
+Tab | Icon | Purpose | Emotional Goal
+---|---:|---|---
+Home | 🏠 | AI-personalized feed, trending, challenges | Discovery + Aspiration
+Discover | 👗 | Explore creators, designers, categories | Exploration + Pride
+Wardrobe | 🧥 | Personal wardrobe, outfits, AI styling | Empowerment + Belonging
+Shop | 🛍 | Marketplace, storefronts, checkout | Satisfaction
+Profile | 👤 | Identity, followers, settings, DNA badge | Identity + Pride
 
-Module | Components | Success Metric
----|---|---
-Social Fashion Feed | Infinite scroll, outfit/designer/creator posts, likes, comments, saves, shares (internal), follow system | DAU/MAU ratio >40%
-Marketplace Product catalog | product pages, shop-the-look, designer storefronts, checkout (manual transfer initially) | First 100 transactions
-Creator Commerce | Creator tagging on products, referral tracking, commission engine | 50 active creators
-User Profiles | Followers/following, saved looks, wardrobe preview | Profile completion >60%
-Basic Wardrobe | Upload items, create collections, save looks | Avg 8 items per user
-
-### Tier 2 — AI & Engagement (Phases 2–3)
-
-These transform retention and create the personalization moat.
-
-Module | Components | Success Metric
----|---|---
-Nexi AI Styling | Outfit generation, event outfit suggestions, personalized recommendations, Style DNA personality profiles | AI interaction rate >30%
-Fashion Challenges | Recreate This Look, Wedding Guest Challenge, Street Style Challenge, Lagos Fashion Challenge | Challenge participation >25%
-Style DNA Onboarding | Progressive multi-step flow capturing archetypes, body profile, preferences, wardrobe snapshot | Completion rate >75%
-
-### Tier 3 — Events Infrastructure (Phase 4)
-
-- Fashion shows, fashion week events, designer launches
-- Ticket sales, VIP passes, event discovery
-- Live shopping during events
-
-### Tier 4 — Rentals (Phase 5)
-
-- Rental inventory, rental calendar, security deposits
-- Rental insurance, return management
-
-### Tier 5 — AR + Virtual Try-On (Phase 7+)
-
-- Architecture designed from day one
-- Implementation only when market and technology mature
+Rule: No tab ever gets added, removed, or renamed. Feature discovery happens within tabs, not through navigation changes.
 
 ---
 
-## Appendix: Implementation notes
+## 1.6 Role-Based Access Control (Day One Architecture)
 
-- Wardrobe data is first-class. Schema and product modeling should keep wardrobe items small and composable.
-- Measure by outcomes. Each issue should have a measurable success metric.
-- Design tokens included in /design/tokens.json (branch: feature/strategy-foundation).
+Seven roles must be implemented from Phase 0 schema design, even if dashboards come later:
+
+Role | Primary Dashboard Value
+---|---
+Consumer | Standard app: Discovery, wardrobe, shopping
+Vendor | Vendor dashboard: Inventory, orders, analytics
+Designer | Designer studio: Brand profile, collections, direct sales
+Tailor | Tailor dashboard: Custom orders, measurements, client chat
+Creator | Creator studio: Content, affiliate links, earnings
+Event Organizer | Event dashboard: Event creation, ticket sales, streaming
+Sustainable Partner | Sustainability portal: Impact tracking, certification display
+
+Each role gets distinct permissions, UI elements, and monetization paths from the moment they're activated.
+
+---
+
+# PART II: PHASED EXECUTION ROADMAP (ADDITIONAL DETAIL)
+
+(Phase breakdowns, success gates, and timelines are documented in the body of this file. See Tiered Build Order for high-level staging.)
+
+## Phase 0: Foundation (Weeks 1–8) — Expanded Tasks
+
+Goal: Establish the technical spine, design system, authentication, and Style DNA onboarding. Seed database with initial content.
+
+0.1 Technical Foundation (high level)
+- Monorepo structure (expo app, server, shared design tokens)
+- Expo SDK and Nativewind/Tailwind config
+- Font loading for Playfair Display & Work Sans
+- Tailwind gold palette as constants
+
+0.2 Style DNA Onboarding (Critical Path)
+- 6-step onboarding flow (Welcome, Archetype, Body & Fit, Lifestyle, Wardrobe Snapshot, Preview)
+- Transient state in Zustand, animated transitions, Cloudinary uploads
+- POST to /api/style-profile on completion; generate initial feed
+
+0.3 Content Seeding
+- Seed 50–100 product images, 20–30 creator posts, 10–15 designer profiles
+
+0.4 Pre-Launch Marketing
+- Waitlist landing page (target 500+ signups)
+- Teaser videos, creator early access, countdown campaign
+
+Phase 0 Success Gates
+- Auth flow complete with <2% error rate
+- Style DNA completion rate >70% in internal testing (50 users)
+- 50+ products seeded with images
+- 500+ waitlist sign-ups
+- All 5 navigation tabs functional (even if minimal)
+
+---
+
+# Implementation notes & next steps
+
+- Wardrobe data is first-class; design data models to keep wardrobe items small and composable.
+- Each issue created from the Roadmap should include measurable success metrics and acceptance criteria.
+- Use the scripts/create_issues_and_project.sh to materialize issues and the Roadmap project board from the markdown drafts in .github/ISSUES.
 

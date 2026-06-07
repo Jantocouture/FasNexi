@@ -6,6 +6,7 @@ import BodyFitScreen from './screens/BodyFitScreen';
 import LifestyleScreen from './screens/LifestyleScreen';
 import WardrobeSnapshotScreen from './screens/WardrobeSnapshotScreen';
 import PreviewScreen from './screens/PreviewScreen';
+import FeedScreen from '../feed/FeedScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -18,6 +19,7 @@ export default function OnboardingNavigator() {
       <Stack.Screen name="Lifestyle" component={LifestyleScreen} />
       <Stack.Screen name="WardrobeSnapshot" component={WardrobeSnapshotScreen} />
       <Stack.Screen name="Preview" component={PreviewScreen} />
+      <Stack.Screen name="Feed" component={FeedScreen} />
     </Stack.Navigator>
   );
 }
